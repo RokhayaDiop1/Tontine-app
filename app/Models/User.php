@@ -18,9 +18,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'prenom',
+        'nom',
+        'telephone',
         'email',
         'password',
+        'profil',
     ];
 
     /**
@@ -45,4 +48,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+   
+
+
+public function tontines()
+{
+    return $this->hasMany(\App\Models\Tontine::class, 'user_id');
+}
+
+// User.php
+public function participants()
+{
+    return $this->hasMany(Participant::class, 'user_id');
+}
+
+    
+
 }

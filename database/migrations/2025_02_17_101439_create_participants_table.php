@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idUser');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tontine_id')->constrained()->onDelete('cascade');
             $table->date('dateNaissance');
-            $table->string('cni')->unique();
+            $table->string('cni', 13)->unique();
             $table->string('adresse');
             $table->string('imageCni')->nullable();
             $table->timestamps();
-
-            $table->foreign('idUser')->references('id')->on('users');
         });
+        
     }
 
     /**

@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tirage extends Model
 {
-    //
+    protected $fillable = [
+        'idUser',
+       'idTontine'
+       
+    ];
 }

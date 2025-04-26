@@ -1,12 +1,36 @@
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
+    <style>
+        nav {
+          background-color: #333;
+          color: #6a11cb;
+          overflow: hidden;
+          white-space: nowrap;
+          padding: 10px 0;
+          position: relative;
+        }
+    
+        .marquee {
+          display: inline-block;
+          padding-left: 100%;
+          animation: defilement 30s linear infinite;
+          font-size: 30px;
+        }
+    
+        @keyframes defilement {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
+      </style>
+    <div class="marquee">Bienvenue sur votre Application! Profitez de nos tontine !</div>
+
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
         <i class="fa fa-bars"></i>
     </button>
 
     <!-- Topbar Search -->
-    <form
+    {{-- <form
         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
         <div class="input-group">
             <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
@@ -17,8 +41,8 @@
                 </button>
             </div>
         </div>
-    </form>
-
+    </form> --}}
+{{-- 
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
@@ -194,8 +218,8 @@
                     Logout
                 </a>
             </div>
-        </li>
+        </li> --}}
 
-    </ul>
+    {{-- </ul> --}}
 
 </nav>
