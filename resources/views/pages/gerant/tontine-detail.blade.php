@@ -6,80 +6,84 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <h4 class="text-dark" style="font-weight: bold">{{ $tontine->libelle }}</h4>
+            <h4 class="text-dark fw-bold">{{ $tontine->libelle }}</h4>
+
             <p><strong>Fréquence :</strong> {{ ucfirst($tontine->frequence) }}</p>
             <p><strong>Durée :</strong> {{ $tontine->dateDebut }} → {{ $tontine->dateFin }}</p>
             <p><strong>Montant par personne :</strong> {{ number_format($tontine->montant_de_base) }} FCFA</p>
             <p><strong>Participants :</strong> {{ $tontine->participants->count() }} / {{ $tontine->nbreParticipant }}</p>
 
             <p>
-                <div class="d-flex align-items-center">
-                    <strong class="me-2">Inscription :</strong>
-                    <form action="{{ route('admin.tontines.toggle-inscription', $tontine->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-sm {{ $tontine->inscription_ouverte ? 'btn-outline-success' : 'btn-outline-danger' }}">
-                            <i class="fas fa-circle {{ $tontine->inscription_ouverte ? 'text-success' : 'text-danger' }}"></i>
-                            {{ $tontine->inscription_ouverte ? 'Ouvert' : 'Fermé' }}
-                        </button>
-                    </form>
-                </div>
-                              
+                <strong>Inscription :</strong>
+                <form action="{{ route('admin.tontines.toggle-inscription', $tontine->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-sm {{ $tontine->inscription_ouverte ? 'btn-outline-success' : 'btn-outline-danger' }}">
+
+                        <i class="fas fa-circle {{ $tontine->inscription_ouverte ? 'text-success' : 'text-danger' }}"></i>
+
+                        {{ $tontine->inscription_ouverte ? 'Ouvert' : 'Fermé' }}
+                    </button>
+                </form>         
             </p>
 
             <p><strong>Créée le :</strong> {{ $tontine->created_at->format('d/m/Y') }}</p>
 
-            <a href="#" class="btn btn-outline-primary btn-sm" style="font-weight: bold">Ajouter un participant</a>
-            <a href="#" class="btn btn-outline-success btn-sm" style="font-weight: bold" >Cotisations</a>
-            <a href="#" class="btn btn-outline-warning btn-sm" style="font-weight: bold" >Tirage</a>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajouterParticipantModal">
+                    <i class="fas fa-user-plus"></i> Ajouter un participant
+                </button>
+
+                <a href="#" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-money-bill-wave"></i> Cotisations
+                </a>
+
+                <a href="#" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-random"></i> Tirage
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<h4 class="mt-4 text-primary">👥 Participants</h4>
-<!-- Bouton pour ouvrir le modal -->
-<button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#ajouterParticipantModal">
-    <i class="fas fa-user-plus"></i> Ajouter un participant
-</button>
+    <h4 class="mt-5 text-primary">👥 Participants</h4>
 
-@if($tontine->participants->isEmpty())
-    <div class="alert alert-info">Aucun participant pour cette tontine.</div>
-@else
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="bg-primary text-white">
-                <tr>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Téléphone</th>
-                    <th>État cotisation</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($tontine->participants as $participant)
+    @if($tontine->participants->isEmpty())
+        <div class="alert alert-info">Aucun participant pour cette tontine.</div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="bg-primary text-white">
                     <tr>
-                        <td>{{ $participant->user->prenom }} {{ $participant->user->nom }}</td>
-                        <td>{{ $participant->user->email }}</td>
-                        <td>{{ $participant->user->telephone }}</td>
-                        <td>
-                            @if($participant->statut === 'payé')
-                                <span class="badge bg-success">Payé</span>
-                            @else
-                                <span class="badge bg-danger">Non payé</span>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="#" class="btn btn-sm btn-outline-info">Détails</a>
-                            <a href="#" class="btn btn-sm btn-outline-success">Marquer payé</a>
-                        </td>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>État cotisation</th>
+                        <th>Actions</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-        
-        
-    </div>
-@endif
+                </thead>
+                <tbody>
+                    @foreach($tontine->participants as $participant)
+                        <tr>
+                            <td>{{ $participant->user->prenom }} {{ $participant->user->nom }}</td>
+                            <td>{{ $participant->user->email }}</td>
+                            <td>{{ $participant->user->telephone }}</td>
+                            <td>
+                                @if($participant->statut === 'payé')
+                                    <span class="badge bg-success">Payé</span>
+                                @else
+                                    <span class="badge bg-danger">Non payé</span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-info">Détails</a>
+                                <a href="#" class="btn btn-sm btn-outline-success">Marquer payé</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
 
 <!-- Modal: Ajouter un Participant -->
 <div class="modal fade" id="ajouterParticipantModal" tabindex="-1" aria-labelledby="ajouterParticipantModalLabel" aria-hidden="true">
@@ -90,13 +94,12 @@
                 <input type="hidden" name="tontine_id" value="{{ $tontine->id }}">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ajouterParticipantModalLabel">Ajouter un participant</h5>
+                    <h5 class="modal-title">Ajouter un participant</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
 
                 <div class="modal-body">
 
-                    {{-- Choix d'utilisateur si nécessaire --}}
                     @if(isset($users))
                         <div class="mb-3">
                             <label for="user_id" class="form-label">Utilisateur existant</label>
@@ -132,12 +135,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Ajouter le participant</button>
+                    <button type="submit" class="btn btn-primary">Valider</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-
 @endsection
