@@ -29,9 +29,9 @@
             <p><strong>Créée le :</strong> {{ $tontine->created_at->format('d/m/Y') }}</p>
 
             <div class="d-flex flex-wrap gap-2 mt-3">
-                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajouterParticipantModal">
+                {{-- <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajouterParticipantModal">
                     <i class="fas fa-user-plus"></i> Ajouter un participant
-                </button>
+                </button> --}}
 
                 <a href="#" class="btn btn-outline-success btn-sm">
                     <i class="fas fa-money-bill-wave"></i> Cotisations
@@ -85,7 +85,7 @@
     @endif
 </div>
 
-<!-- Modal: Ajouter un Participant -->
+{{-- <!-- Modal: Ajouter un Participant -->
 <div class="modal fade" id="ajouterParticipantModal" tabindex="-1" aria-labelledby="ajouterParticipantModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -140,5 +140,5 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection

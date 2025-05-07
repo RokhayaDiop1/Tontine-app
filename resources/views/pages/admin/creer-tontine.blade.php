@@ -49,7 +49,7 @@
                                     <option value="">-- Sélectionnez une fréquence --</option>
                                     <option value="JOURNALIERE">Journalière</option>
                                     <option value="HEBDOMADAIRE">Hebdomadaire</option>
-                                    <option value="MENSUELLE">Mensuelle</option>
+                                    <option value="MENSUEL">MENSUEL</option>
                                 </select>
                             </div>
                         </div>

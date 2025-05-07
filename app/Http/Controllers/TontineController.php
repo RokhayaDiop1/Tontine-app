@@ -21,7 +21,7 @@ class TontineController extends Controller
     {
         $validated = $request->validate([
             'libelle' => 'required|string|max:255',
-            'frequence' => 'required|in:JOURNALIERE,HEBDOMADAIRE,MENSUELLE',
+            'frequence' => 'required|in:JOURNALIERE,HEBDOMADAIRE,MENSUEL',
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
             'description' => 'required|string',
@@ -29,7 +29,7 @@ class TontineController extends Controller
             'montant_total' => 'required|numeric|min:0',
             'nbreParticipant' => 'required|integer|min:1',
             'user_id' => 'required|exists:users,id',
-            'inscription_ouvert' => 'required|in:ouvert,fermer',
+            
         ]);
     
         Tontine::create($validated);
@@ -112,7 +112,7 @@ public function update(Request $request, $id)
 {
     $validated = $request->validate([
         'libelle' => 'required|string|max:255',
-        'frequence' => 'required|in:HEBDOMADAIRE,MENSUELLE',
+        'frequence' => 'required|in:HEBDOMADAIRE,MENSUEL',
         'dateDebut' => 'required|date',
         'dateFin' => 'required|date|after_or_equal:dateDebut',
         'description' => 'required|string',

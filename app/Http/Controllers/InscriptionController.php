@@ -28,7 +28,7 @@ class InscriptionController extends Controller
             'adresse'        => 'required|string',
             'password'       => 'required|string|min:6|confirmed',
         ]);
-
+    
         // Création de l'utilisateur
         $user = User::create([
             'prenom'    => $validated['prenom'],
@@ -36,23 +36,16 @@ class InscriptionController extends Controller
             'email'     => $validated['email'],
             'telephone' => $validated['telephone'],
             'password'  => Hash::make($validated['password']),
-            'profil'    => 'PARTICIPANT',
+            'profil'    => 'PARTICIPANT', // Ou null si tu veux l’attribuer plus tard
         ]);
-
+    
         if ($user) {
-            // Création du participant lié à l'utilisateur
-            Participant::create([
-                'idUser'        => $user->id,
-                'dateNaissance' => $validated['dateNaissance'],
-                'cni'           => $validated['cni'],
-                'adresse'       => $validated['adresse'],
-            ]);
-
-            return redirect()->route('auth.create')->with('success', 'Inscription réussie. Connectez-vous maintenant.');
+            return redirect()->route('auth.create')->with('success', 'Inscription réussie. Veuillez vous connecter.');
         }
-
+    
         return back()->with('error', "Une erreur s'est produite. Veuillez réessayer.");
     }
+    
 
     public function home()
     {

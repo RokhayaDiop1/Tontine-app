@@ -125,10 +125,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/gerant/tontine/{id}', [TontineController::class, 'show'])->name('tontine.show');
 });
 
-Route::post('/tontine/{id}/participant/ajouter', [ParticipantController::class, 'ajouter'])->name('tontine.ajouterParticipant');
-Route::middleware('auth')->group(function () {
-    Route::post('/participants', [ParticipantController::class, 'store'])->name('participants.store');
+// ====================== PARTICIPANT ======================
+Route::middleware(['auth'])->prefix('participant')->name('participant.')->group(function () {
+
+    Route::get('/dashboard', [ParticipantController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/tontines', [ParticipantController::class, 'mesTontines'])->name('tontines');
+    Route::get('/tontines/{id}', [ParticipantController::class, 'voirTontine'])->name('tontine.show');
+
+    Route::get('/cotisations', [ParticipantController::class, 'cotisations'])->name('cotisations');
+    Route::get('/profil', [ParticipantController::class, 'profil'])->name('profil');
 });
+
+Route::get('/participants/create/{tontine_id}', [ParticipantController::class, 'create'])->name('participants.create');
+Route::post('/participants/store', [ParticipantController::class, 'store'])->name('participants.store');
+// Afficher le formulaire de participation
+Route::get('/tontines/{tontine}/participer', [ParticipantController::class, 'create'])->name('participants.create');
+
+// Enregistrer la participation
+Route::post('/participants', [ParticipantController::class, 'store'])->name('participants.store');
+
 
 Route::post('/logout', function () {
     Auth::logout();
