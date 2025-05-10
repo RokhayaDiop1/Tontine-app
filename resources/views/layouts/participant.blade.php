@@ -88,10 +88,10 @@
         @yield('content')
     </main>
 
-    <!-- Footer -->
+    {{-- <!-- Footer -->
     <footer class="text-center py-4 text-muted">
         &copy; {{ date('Y') }} Ma Tontine. Tous droits réservés.
-    </footer>
+    </footer> --}}
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

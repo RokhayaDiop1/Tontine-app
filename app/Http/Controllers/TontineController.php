@@ -6,6 +6,8 @@ use App\Models\Tontine;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Participant;
+
 
 
 class TontineController extends Controller
@@ -112,7 +114,7 @@ public function update(Request $request, $id)
 {
     $validated = $request->validate([
         'libelle' => 'required|string|max:255',
-        'frequence' => 'required|in:HEBDOMADAIRE,MENSUEL',
+        'frequence' => 'required|in:JOURNALIERE,HEBDOMADAIRE,MENSUEL',
         'dateDebut' => 'required|date',
         'dateFin' => 'required|date|after_or_equal:dateDebut',
         'description' => 'required|string',
@@ -136,6 +138,21 @@ public function destroy($id)
     return redirect()->route('admin.liste-tontines')->with('success', 'Tontine supprimée avec succès.');
 }
 
+public function quitter($id)
+{
+    $user = Auth::user();
 
+    // Recherche l'enregistrement du participant
+    $participant = Participant::where('user_id', $user->id)
+                    ->where('tontine_id', $id)
+                    ->first();
+
+    if ($participant) {
+        $participant->delete();
+        return redirect()->back()->with('success', 'Vous avez quitté la tontine avec succès.');
+    }
+
+    return redirect()->back()->with('error', 'Vous ne participez pas à cette tontine.');
+}
 
 }

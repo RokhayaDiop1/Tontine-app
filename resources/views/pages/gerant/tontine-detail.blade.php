@@ -56,7 +56,6 @@
                         <th>Nom</th>
                         <th>Email</th>
                         <th>Téléphone</th>
-                        <th>État cotisation</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -67,78 +66,82 @@
                             <td>{{ $participant->user->email }}</td>
                             <td>{{ $participant->user->telephone }}</td>
                             <td>
-                                @if($participant->statut === 'payé')
-                                    <span class="badge bg-success">Payé</span>
-                                @else
-                                    <span class="badge bg-danger">Non payé</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-outline-info">Détails</a>
-                                <a href="#" class="btn btn-sm btn-outline-success">Marquer payé</a>
+                                 <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#cotisations-{{ $participant->id }}">
+                                     Détails
+                                 </button>
                             </td>
                         </tr>
+                        <tr class="collapse bg-light" id="cotisations-{{ $participant->id }}">
+                            <td colspan="4">
+                                <h6 class="text-primary">Cotisations de {{ $participant->user->prenom }} {{ $participant->user->nom }}</h6>
+
+                                @php
+                                    $dateDebut = \Carbon\Carbon::parse($tontine->dateDebut);
+                                    $dateFin = \Carbon\Carbon::parse($tontine->dateFin);
+                                    $frequence = strtoupper($tontine->frequence);
+                                    $dateActuelle = $dateDebut->copy();
+                                    $today = \Carbon\Carbon::today();
+
+                                    $rows = [];
+                                    while ($dateActuelle <= $dateFin) {
+                                        $isPayee = \App\Models\Cotisation::where('idUser', $participant->user_id)
+                                            ->where('idTontine', $tontine->id)
+                                            ->whereDate('date_echeance', $dateActuelle)
+                                            ->exists();
+
+                                        $statut = $isPayee ? 'Déjà payée'
+                                            : ($dateActuelle->isSameDay($today) ? 'À payer aujourd’hui'
+                                            : ($dateActuelle->isFuture() ? 'À venir' : 'Retard'));
+
+                                        $rows[] = [
+                                            'date' => $dateActuelle->format('d/m/Y'),
+                                            'statut' => $statut,
+                                            'montant' => $tontine->montant_de_base
+                                        ];
+
+                                        match ($frequence) {
+                                            'JOURNALIERE' => $dateActuelle->addDay(),
+                                            'HEBDOMADAIRE' => $dateActuelle->addWeek(),
+                                            'MENSUELLE' => $dateActuelle->addMonth(),
+                                            default => throw new Exception("Fréquence invalide")
+                                        };
+                                    }
+                                @endphp
+
+                                <table class="table table-sm table-bordered mt-3">
+                                    <thead class="table-secondary text-center">
+                                        <tr>
+                                            <th>Date échéance</th>
+                                            <th>Montant</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        @foreach($rows as $r)
+                                            <tr>
+                                                <td>{{ $r['date'] }}</td>
+                                                <td>{{ number_format($r['montant'], 0, ',', ' ') }} FCFA</td>
+                                                <td>
+                                                    <span class="badge
+                                                        @if($r['statut'] === 'Déjà payée') bg-success
+                                                        @elseif($r['statut'] === 'À payer aujourd’hui') bg-warning text-dark
+                                                        @elseif($r['statut'] === 'Retard') bg-danger
+                                                        @else bg-secondary
+                                                        @endif">
+                                                        {{ $r['statut'] }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
                     @endforeach
                 </tbody>
             </table>
         </div>
     @endif
 </div>
-
-{{-- <!-- Modal: Ajouter un Participant -->
-<div class="modal fade" id="ajouterParticipantModal" tabindex="-1" aria-labelledby="ajouterParticipantModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ route('participants.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="tontine_id" value="{{ $tontine->id }}">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Ajouter un participant</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    @if(isset($users))
-                        <div class="mb-3">
-                            <label for="user_id" class="form-label">Utilisateur existant</label>
-                            <select name="user_id" class="form-control" required>
-                                <option value="">-- Sélectionner un utilisateur --</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->prenom }} {{ $user->nom }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    @endif
-
-                    <div class="mb-3">
-                        <label for="dateNaissance" class="form-label">Date de naissance</label>
-                        <input type="date" name="dateNaissance" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="cni" class="form-label">Numéro CNI</label>
-                        <input type="text" name="cni" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="adresse" class="form-label">Adresse</label>
-                        <input type="text" name="adresse" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="imageCni" class="form-label">Image CNI (facultative)</label>
-                        <input type="file" name="imageCni" class="form-control">
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Valider</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> --}}
 @endsection

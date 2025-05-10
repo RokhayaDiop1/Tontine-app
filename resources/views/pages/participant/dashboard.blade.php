@@ -37,6 +37,33 @@
         transform: translateY(-5px);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
+
+
+    .btn-transparent-danger {
+        background-color: transparent !important;
+        border: 2px solid #f3eeee; /* rouge */
+        color: #dc3545 !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-transparent-danger:hover {
+        background-color: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .btn-transparent-success {
+        background-color: transparent !important;
+        border: 2px solid #f2f3f3; /* vert */
+        color: #eeefee !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-transparent-success:hover {
+        background-color: #dc3545 !important;
+        color: #fff !important;
+    }
+
+
 </style>
 
 <div class="container-fluid py-4">
@@ -50,8 +77,7 @@
                 Gérez vos cotisations, suivez vos tontines et visualisez vos bénéfices en toute simplicité.
                 
             </p>
-            {{-- Test Debug --}} 
-            <p style="color: red; font-weight: bold;">TEST DEBUG</p>
+        
 
             <a href="#section-tontines" class="btn btn-warning btn-lg mt-3 fw-bold">
                 Je découvre les tontines
@@ -76,18 +102,47 @@
                                     <i class="fas fa-piggy-bank fa-lg text-primary"></i>
                                 </div>
                                 <h6 class="text-primary mb-2 font-weight-bold">{{ $tontine->libelle }}</h6>
-                                <span class="badge {{ $tontine->dateFin < now() ? 'badge-danger' : 'badge-success' }}">
-                                    {{ $tontine->dateFin < now() ? 'Terminée' : 'En cours' }}
+                                @php
+                                    $aujourdhui = \Carbon\Carbon::now();
+                                    $debut = \Carbon\Carbon::parse($tontine->dateDebut);
+                                    $fin = \Carbon\Carbon::parse($tontine->dateFin);
+                                    $estTerminee = $fin->lt($aujourdhui);
+                                    $estCommencee = $debut->lte($aujourdhui);
+                                    $nbParticipants = \App\Models\Participant::where('tontine_id', $tontine->id)->count();
+                                @endphp
+
+                                <span class="badge
+                                    @if($estTerminee)
+                                        bg-danger
+                                    @elseif($estCommencee && $nbParticipants >= $tontine->nbreParticipant)
+                                        bg-success
+                                    @else
+                                        bg-warning
+                                    @endif">
+                                    @if($estTerminee)
+                                        Terminée
+                                    @elseif($estCommencee && $nbParticipants >= $tontine->nbreParticipant)
+                                        En cours
+                                    @else
+                                        En attente
+                                    @endif
                                 </span>
+
                                 <ul class="list-unstyled text-left mt-3 mb-0 small">
                                     <li><strong>Fréquence :</strong> {{ $tontine->frequence }}</li>
                                     <li><strong>Début :</strong> {{ $tontine->dateDebut }}</li>
                                     <li><strong>Fin :</strong> {{ $tontine->dateFin }}</li>
                                     <li><strong>Base :</strong> {{ number_format($tontine->montant_de_base, 0, ',', ' ') }} FCFA</li>
                                     <li><strong>Total :</strong> {{ number_format($tontine->montant_total, 0, ',', ' ') }} FCFA</li>
-                                    <li><strong>Participants :</strong> {{ $tontine->nbreParticipant }}</li>
-                                    <a href="{{ route('participants.create', $tontine->id) }}" class="btn btn-primary btn-sm mt-3">Participer</a>
+                                    <li><strong>Participants :</strong> {{ $nbParticipants }} / {{ $tontine->nbreParticipant }}</li>
                                 </ul>
+                                
+                                @if($estTerminee || $nbParticipants >= $tontine->nbreParticipant)
+                                    <button class="btn btn-secondary btn-sm mt-3" disabled>Participation fermée</button>
+                                @else
+                                    <a href="{{ route('participants.create', $tontine->id) }}" class="btn btn-primary btn-sm mt-3">Participer</a>
+                                @endif
+                                
                             </div>
                         </div>
                     @endforeach
@@ -124,9 +179,9 @@
         @endforeach
     </div>
 
-    {{-- {{-- MES TONTINES --}}
+    {{-- MES TONTINES --}}
 <div id="section-mes-tontines" class="mb-5 pt-5">
-    <h3 class="text-center text-white mb-5">Mes Tontines</h3>
+    <h3 class="text-primary mb-4 text-center">Mes Tontines</h3>
 
     @if($mesTontines->count())
         <div class="row justify-content-center g-4">
@@ -143,7 +198,24 @@
                                 <li><strong>Début :</strong> {{ $tontine->dateDebut }}</li>
                                 <li><strong>Fin :</strong> {{ $tontine->dateFin }}</li>
                             </ul>
-                            <a href="#" class="btn btn-outline-light mt-3">Détails</a>
+
+                            {{-- Boutons --}}
+                            <div class="d-flex justify-content-center gap-2 mt-3">
+                                <form id="quit-form-{{ $tontine->id }}" action="{{ route('tontine.quitter', $tontine->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                
+                                <button type="button" class="btn btn-transparent-danger btn-sm" onclick="confirmQuit({{ $tontine->id }})">Quitter</button>
+                                
+                            
+                                <a href="{{ route('participant.tontine.cotisations', $tontine->id) }}" class="btn btn-transparent-success btn-sm">
+                                    Faire ma cotisation
+                                </a>
+                                
+                            </div>
+                            
+
                         </div>
                     </div>
                 </div>
@@ -155,24 +227,47 @@
 </div>
 
 
-    {{-- MES COTISATIONS --}}
-    <div id="section-cotisations" class="mb-5">
-        <h3 class="text-success mb-3">Mes Cotisations</h3>
-        <p>Historique ou statut de vos cotisations...</p>
-    </div>
 
-    {{-- PROCHAINE COLLECTE --}}
+    {{-- LIEN VERS PAGE COTISATIONS --}}
+<div id="section-cotisations" class="mb-5 text-center">
+    <h3 class="text-success mb-4">Mes Cotisations</h3>
+    <a href="{{ route('participant.cotisations') }}" class="btn btn-outline-success btn-lg">
+        Voir mes cotisations
+    </a>
+</div>
+
+    
+    {{-- PROCHAINE COLLECTE
     <div id="section-collecte" class="mb-5">
         <h3 class="text-warning mb-3">Prochaine Collecte</h3>
         <p>Détails sur la prochaine collecte prévue...</p>
-    </div>
+    </div> --}}
 
     {{-- GAINS --}}
     <div id="section-gains" class="mb-5">
         <h3 class="text-info mb-3">Mes Gains</h3>
         <p>Visualisez vos gains obtenus dans les tontines...</p>
-        <p>Visualisez vos gains obtenus dans les tontines...</p>
     </div>
 
 </div>
+
+<script>
+    function confirmQuit(tontineId) {
+        Swal.fire({
+            title: 'Confirmer le départ',
+            text: "Souhaitez-vous vraiment quitter cette tontine ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Oui, quitter',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('quit-form-' + tontineId).submit();
+            }
+        });
+    }
+</script>
+
 @endsection

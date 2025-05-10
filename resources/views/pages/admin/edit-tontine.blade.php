@@ -26,6 +26,7 @@
             <div class="col-md-6">
                 <label for="frequence" class="form-label">Fréquence</label>
                 <select name="frequence" class="form-select" required>
+                    <option value="JOURNALIERE" @selected($tontine->frequence == 'JOURNALIERE')>JOURNALIERE</option>
                     <option value="HEBDOMADAIRE" @selected($tontine->frequence == 'HEBDOMADAIRE')>Hebdomadaire</option>
                     <option value="MENSUELLE" @selected($tontine->frequence == 'MENSUELLE')>Mensuelle</option>
                 </select>

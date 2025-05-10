@@ -133,8 +133,9 @@ Route::middleware(['auth'])->prefix('participant')->name('participant.')->group(
     Route::get('/tontines', [ParticipantController::class, 'mesTontines'])->name('tontines');
     Route::get('/tontines/{id}', [ParticipantController::class, 'voirTontine'])->name('tontine.show');
 
-    Route::get('/cotisations', [ParticipantController::class, 'cotisations'])->name('cotisations');
-    Route::get('/profil', [ParticipantController::class, 'profil'])->name('profil');
+    // Route::get('/cotisations', [ParticipantController::class, 'cotisations'])->name('cotisations');
+    // Route::get('/profil', [ParticipantController::class, 'profil'])->name('profil');
+    
 });
 
 Route::get('/participants/create/{tontine_id}', [ParticipantController::class, 'create'])->name('participants.create');
@@ -144,6 +145,17 @@ Route::get('/tontines/{tontine}/participer', [ParticipantController::class, 'cre
 
 // Enregistrer la participation
 Route::post('/participants', [ParticipantController::class, 'store'])->name('participants.store');
+Route::delete('/tontine/{id}/quitter', [TontineController::class, 'quitter'])->name('tontine.quitter');
+Route::get('/cotisation/{tontine}/create', [CotisationController::class, 'create'])->name('cotisation.create');
+// Route::get('/participant/cotisations', [ParticipantController::class, 'cotisations'])->name('participant.cotisations');
+
+// Route::get('/cotisation/payer/{tontine}', [CotisationController::class, 'create'])->name('cotisation.payer');
+// Route::post('/cotisation/payer', [CotisationController::class, 'store'])->name('cotisation.store');
+Route::get('/participant/tontine/{id}/cotisations', [CotisationController::class, 'voirCotisations'])->name('participant.tontine.cotisations');
+Route::post('/cotisation/store', [CotisationController::class, 'store'])->name('cotisation.store');
+
+Route::get('/participant/mes-cotisations', [App\Http\Controllers\CotisationController::class, 'historique'])->name('participant.cotisations');
+
 
 
 Route::post('/logout', function () {

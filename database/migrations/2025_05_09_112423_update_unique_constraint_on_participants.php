@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->dropUnique('unique_user_cni'); // ou 'participants_cni_unique' selon le cas
+            // $table->dropUnique('unique_user_cni'); // ou 'participants_cni_unique' selon le cas
         });
     }
 

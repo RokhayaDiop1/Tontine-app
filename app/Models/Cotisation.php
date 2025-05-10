@@ -8,10 +8,18 @@ class Cotisation extends Model
 {
     protected $fillable = [
         'idUser',
-       'idTontine',
-       'montant',
-       'moyen_paiement'
-
+        'idTontine',
+        'date_echeance', // ✅ Obligatoire
+        'montant',
+        'moyen_paiement',
+        'statut'
        
     ];
+
+    // Dans Cotisation.php
+public function tontine()
+{
+    return $this->belongsTo(Tontine::class, 'idTontine');
+}
+
 }

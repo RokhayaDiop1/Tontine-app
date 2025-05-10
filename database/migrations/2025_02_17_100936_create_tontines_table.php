@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('montant_total');
             $table->integer('montant_de_base');
             $table->integer('nbreParticipant');
+            $table->enum('status', ['en_attente', 'active', 'terminee'])->default('en_attente');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
